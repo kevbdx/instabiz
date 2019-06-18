@@ -1,5 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+import os
+import os.path
 import requests
 import urllib.request
 import urllib.parse
@@ -16,8 +18,13 @@ import functools
 import operator
 import re
 import emoji
+from PIL import Image
+import glob
+from imageai.Prediction import ImagePrediction
+
 
 USER_AGENTS = ['Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36']
+execution_path = os.getcwd()
 
 class Insta_Info_Scraper:
     def __init__(self, url, user_agents=None):
@@ -116,9 +123,46 @@ class Insta_Info_Scraper:
             json.dump(self.info_arr, outfile, indent=4)
         print("Json file containing required info is created............")    
 
+def getPred(strFichier):
+    newDict = {}
+    prediction = ImagePrediction()
+    prediction.setModelTypeAsResNet()
+    prediction.setModelPath( execution_path + "/resnet50_weights_tf_dim_ordering_tf_kernels.h5")
+    prediction.loadModel()
+
+    predictions, percentage_probabilities = prediction.predictImage(execution_path + "/pics/" + strFichier, result_count=2)
+    for index in range(len(predictions)):
+        newDict.update({predictions[index] : percentage_probabilities[index]})
+    return newDict
+
+
+
+def menu():
+    print('***** INSTABIZBIZ *****')
+    print('1) Prédire un post')
+    print('2) DEMO - Prédiction du dernier post')
+    print('3) Informations de compte')
+    choice = input('Votre choix : ')
+
+    if choice == '1':
+        path = execution_path + "/pics"
+        valid_images = [".jpg",".gif",".png"]
+        if(len(os.listdir(path)) != 1):
+            print("Le dossier contient plus d'une image.")
+            menu()
+        else:
+            ext = os.path.splitext(os.listdir(path)[0])[1]
+            if ext.lower() not in valid_images:
+                print("L'extension n'est pas supportée.")
+                menu()
+            else:
+                strFichier = os.listdir(path)[0]
+                pred = getPred(strFichier)
+                print("Votre image contient : " + (next(iter(pred)).replace('_', ' ')))
+
 if __name__ == '__main__':
+    menu()
     url = 'https://www.instagram.com/sla2z'
     instagram = Insta_Info_Scraper(url)
     post_metrics = instagram.post_metrics()
-    print(post_metrics)
 
