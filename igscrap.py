@@ -21,7 +21,7 @@ import emoji
 from PIL import Image
 import glob
 from imageai.Prediction import ImagePrediction
-
+from hashtagsScrapper import scrapMyHashtags
 
 USER_AGENTS = ['Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36']
 execution_path = os.getcwd()
@@ -77,10 +77,10 @@ class Insta_Info_Scraper:
                     new_dict['description'] = (em_split_emoji[0]).replace('\\n', '').rstrip()
                     descrWithHashtags.pop(0)
                     new_dict['hashtags'] = descrWithHashtags
-                    if(len(em_split_emoji)>1):
-                        new_dict['emojis'] = ', '.join(c for c in em_split_emoji if c >= 'U+1F600' and c != '\\n' and c)
-                    else:
-                        new_dict['emojis'] = []
+                    #if(len(em_split_emoji)>1):
+                    #    new_dict['emojis'] = ', '.join(c for c in em_split_emoji if c >= 'U+1F600' and c != '\\n' and c)
+                    #else:
+                    #    new_dict['emojis'] = []
                     new_dict['comments'] = node.get('edge_media_to_comment').get('count')
                     new_dict['comments_disabled'] = node.get('comments_disabled')
                     new_dict['time'] = node.get('taken_at_timestamp')
@@ -159,10 +159,25 @@ def menu():
                 strFichier = os.listdir(path)[0]
                 pred = getPred(strFichier)
                 print("Votre image contient : " + (next(iter(pred)).replace('_', ' ')))
+                taglist = []
+                print("Entrez vos hashtags ('777' pour quitter) : ")
+                hashs = ""
+                while hashs != "777":
+                    hashs = input("Hashtag? ")
+                    taglist.append(hashs)
+                taglist = taglist[:-1]
+                scrapMyHashtags(taglist)
+                print("La popularité de vos hashtags sont dans hashtag_list.csv.")
+def predictFromDescr(data):
+    return 0
+
+
+
 
 if __name__ == '__main__':
     menu()
     url = 'https://www.instagram.com/sla2z'
     instagram = Insta_Info_Scraper(url)
     post_metrics = instagram.post_metrics()
+    print(post_metrics)
 

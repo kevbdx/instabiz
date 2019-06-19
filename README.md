@@ -14,3 +14,9 @@ wget https://github.com/OlafenwaMoses/ImageAI/releases/download/1.0/resnet50_coc
 ```bash
 python3 igscrap.py
 ```
+
+### You need to download the right version of chromedriver ! (depending on your chrome web browser version)
+
+```bash
+python3 hashtagsScrapper.py
+```
