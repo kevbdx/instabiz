@@ -79,7 +79,7 @@ class Insta_Info_Scraper:
                     new_dict['likes'] = node.get('edge_liked_by').get('count')
                     new_dict['location'] = "" if node.get('location') is None else node.get('location').get('name')
                     new_dict['is_video'] = node.get('is_video')
-                    new_dict['img_description'] = node.get('accessibility_caption')[19:]
+                    new_dict['img_description'] = node.get('accessibility_caption') if node.get('accessibility_caption') else 'Na'
                     results.append(new_dict)
         return results
 
@@ -107,7 +107,22 @@ class Insta_Info_Scraper:
         self.ctx.verify_mode = ssl.CERT_NONE
         self.info_arr=[]
 
-        with open('users.txt') as f:
+        print('***** INSTABIZBIZ *****')
+        print('Selectionner votre niche : ')
+        print('1) Simple user')
+        print('2) Sneakers user (fashion - chaussure)')
+        print('3) Fitness')
+        choice = input('Votre choix : ')
+        if choice == '1':
+            user_file = 'users.txt'
+        elif choice == '2':
+            user_file = 'sneakers.txt'
+        elif choice == '3':
+            user_file = 'users.txt'
+        else :
+            user_file = 'users.txt'
+
+        with open(user_file) as f:
             self.content = f.readlines()
         self.content = [x.strip() for x in self.content]
         for url in self.content:
