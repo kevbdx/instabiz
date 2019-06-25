@@ -16,8 +16,13 @@ import functools
 import operator
 import re
 import emoji
+from imageai.Prediction import ImagePrediction
+from PIL import Image
+import os
+import os.path
 
 USER_AGENTS = ['Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36']
+execution_path = os.getcwd()
 
 class Insta_Info_Scraper:
     def __init__(self, user_agents=None):
@@ -27,6 +32,7 @@ class Insta_Info_Scraper:
         if self.user_agents and isinstance(self.user_agents, list):
             return choice(self.user_agents)
         return choice(USER_AGENTS)
+
 
     def __request_url(self, url):
         try:
@@ -112,6 +118,29 @@ class Insta_Info_Scraper:
         print('3) Fitness')
         choice = input('Votre choix : ')
         if choice == '1':
+            path = execution_path + "/pics"
+            valid_images = [".jpg",".gif",".png"]
+            if(len(os.listdir(path)) != 1):
+                print("Le dossier contient plus d'une image.")
+                menu()
+            else:
+                ext = os.path.splitext(os.listdir(path)[0])[1]
+                if ext.lower() not in valid_images:
+                    print("L'extension n'est pas supportée.")
+                    menu()
+                else:
+                    strFichier = os.listdir(path)[0]
+                    newDict = {}
+                    prediction = ImagePrediction()
+                    prediction.setModelTypeAsResNet()
+                    prediction.setModelPath( execution_path + "/resnet50_weights_tf_dim_ordering_tf_kernels.h5")
+                    prediction.loadModel()
+
+                    predictions, percentage_probabilities = prediction.predictImage(execution_path + "/pics/" + strFichier, result_count=2)
+                    for index in range(len(predictions)):
+                        newDict.update({predictions[index] : percentage_probabilities[index]})
+                    pred = newDict
+                    print("Votre image contient : " + (next(iter(pred)).replace('_', ' ')))
             user_file = 'users.txt'
         elif choice == '2':
             user_file = 'sneakers.txt'
