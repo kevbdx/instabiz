@@ -48,7 +48,7 @@ class Insta_Info_Scraper:
         raw_string = script_tag.text.strip().replace('window._sharedData =', '').replace(';', '')
         return json.loads(raw_string)
 
-    def post_metrics(self, url):
+    def post_metrics(self,user, followers, following, posts, url):
         results = []
         try:
             response = self.__request_url(url)
@@ -73,6 +73,10 @@ class Insta_Info_Scraper:
                         new_dict['emojis'] = ', '.join(c for c in em_split_emoji if c >= 'U+1F600' and c != '\\n' and c)
                     else:
                         new_dict['emojis'] = []
+                    new_dict["user"] = user
+                    new_dict["followers"] = followers
+                    new_dict["following"] = following
+                    new_dict["postsCount"] = posts
                     new_dict['comments'] = node.get('edge_media_to_comment').get('count')
                     new_dict['comments_disabled'] = node.get('comments_disabled')
                     new_dict['time'] = node.get('taken_at_timestamp')
@@ -93,13 +97,7 @@ class Insta_Info_Scraper:
         followers = text[0]
         following = text[2]
         posts = text[4]
-        info={}
-        info["User"] = user
-        info["Followers"] = followers
-        info["Following"] = following
-        info["PostsCount"] = posts
-        info["PostsDetails"] = self.post_metrics(url)
-        self.info_arr.append(info)
+        self.info_arr.append(self.post_metrics(user, followers, following, posts,url))
 
     def main(self):
         self.ctx = ssl.create_default_context()
