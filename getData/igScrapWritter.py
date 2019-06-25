@@ -62,7 +62,7 @@ class Insta_Info_Scraper:
                 new_dict = {}
                 if node and isinstance(node,dict):
                     fullDescr = str(node.get('edge_media_to_caption').get('edges'))[20:-4]
-                    descrWithHashtags = fullDescr.split('#')
+                    descrWithHashtags = [hash.split(' ')[0] for hash in fullDescr.split('#')]
                     em_split_emoji = emoji.get_emoji_regexp().split(descrWithHashtags[0])
                     em_split_whitespace = [substr.split() for substr in em_split_emoji]
                     em_split = functools.reduce(operator.concat, em_split_whitespace)
@@ -83,7 +83,7 @@ class Insta_Info_Scraper:
                     new_dict['likes'] = node.get('edge_liked_by').get('count')
                     new_dict['location'] = "" if node.get('location') is None else node.get('location').get('name')
                     new_dict['is_video'] = node.get('is_video')
-                    new_dict['img_description'] = node.get('accessibility_caption') if node.get('accessibility_caption') else 'Na'
+                    new_dict['img_description'] = node.get('accessibility_caption')[19:] if node.get('accessibility_caption') else 'Na'
                     results.append(new_dict)
         return results
 
